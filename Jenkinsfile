@@ -32,6 +32,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Docker Build') {
+            steps {
+                bat 'docker compose build'
+            }
+        }
+
+        stage('Docker Deploy') {
+            steps {
+                bat 'docker compose up -d'
+            }
+        }
     }
 
     post {
