@@ -1,40 +1,53 @@
+# ============================================================
+# ASHA Worker CI/CD
+# Save this file at: .github/workflows/ci-cd.yml
+# ============================================================
 name: ASHA Worker CI/CD
 
+# When this workflow runs
 on:
   push:
     branches:
-      - main
-
+      - main            # when code is pushed to main
   pull_request:
     branches:
-      - main
+      - main            # when a pull request targets main
+  workflow_dispatch:    # lets you run it manually from the Actions tab
 
-  workflow_dispatch:
+# Only allow reading the code (safe default)
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-24.04
 
     steps:
+      # 1. Download the repo code (v5 runs on Node 24, no Node 20 warning)
       - name: Checkout Code
         uses: actions/checkout@v5
 
+      # 2. Install Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 24
 
+      # 3. Install backend packages
       - name: Install Backend
         working-directory: backend
         run: npm ci
 
+      # 4. Install frontend packages
       - name: Install Frontend
         working-directory: frontend
         run: npm ci
 
+      # 5. Build the frontend (creates the dist folder)
       - name: Build Frontend
         working-directory: frontend
         run: npm run build
 
+      # 6. Build Docker images using docker-compose.yml
       - name: Build Docker Images
         run: docker compose build
